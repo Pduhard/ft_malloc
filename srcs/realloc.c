@@ -2,6 +2,10 @@
 
 void *realloc(void *ptr, size_t size)
 {
-    return (ptr);
+    write(2, "realloc=>newmallo\n", sizeof("realloc=>newmalloc\n"));
+    // exit(0);
+    memcpyyyyyy;
+    return (malloc(size));
     (void)size;
+    (void)ptr;
 }

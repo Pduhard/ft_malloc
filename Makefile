@@ -43,7 +43,8 @@ BIN_PATH	=	./bins/
 SRC		=		malloc.c		\
 				free.c			\
 				realloc.c		\
-						
+				show_alloc_mem.c		\
+				ft_putnbr.c		\
 
 # ASM_SRC	= unpack.s	\
 
