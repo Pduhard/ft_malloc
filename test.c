@@ -28,24 +28,32 @@ int main(void)
 	// 	void *data3 = mmap(NULL, getpagesize() * getpagesize() * 0x100, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 	// printf("%s %d\n", strerror(errno), 0xA0000);
 	// printf("%lx\n%lx\n%lx\n", data, data2, data3);
-	int rd;
+	unsigned int rd;
 
-	printf("sizeof heaphdr %zu sizeof blockhdr %zu\n", sizeof(t_heaphdr), sizeof(t_blockhdr));
-	rd = 0xfff12340;
-	for (int i = 0; i < 20000; ++i)
+	printf("sizeof heaphdr %zu sizeof blockhdr %zu\n", 0xffffffffffffffff, sizeof(t_blockhdr));
+	printf("sizeof heaphdr %zu sizeof blockhdr %zu\n", 0xffffffffffffffff, sizeof(t_blockhdr));
+	
+	// return (0);
+	rd = 0x5ff12340;
+	for (int i = 0; i < 200000; ++i)
 	{
 		//printf("")
 		// ft_putnbr(rd >> 16);
 		if (!rd)
 			rd = 0x12356;
-		char *e = malloc((rd >> 16) % 4096);
-		for (int j = 0; j < (rd >> 16) % 4096; j++)
-			*(e + j - 1) = 'f';
+		char *e = malloc((rd >> 16)% 4096);
+		for (unsigned int j = 0; j < (rd >> 16) % 4096; j++)
+			*(e + j ) = 'f';
+		// realloc(e, 4097);
+		// free
 		rd ^= rd >> 2;
 		rd ^= rd << 4;
 		rd ^= rd >> 6;
+	printf("%d\n", i);
 		// show_alloc_mem();
 	}
+	// char *test = malloc(5);
+	// test = realloc(test +2, 7);
 	// e[0] = 'a';
 	// e[1] = 'a';
 	// e[2] = '\n';

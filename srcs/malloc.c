@@ -1,212 +1,178 @@
 #include "libft_malloc.h"
 
-t_heaphdr *heap = NULL;
-// #include "libft.h"
+t_heaphdr *heap_list[3] = {NULL, NULL, NULL};
 
-void        add_heap(t_heaphdr *new_heap)
+e_heaptype  get_heap_type(size_t size)
 {
-    t_heaphdr *lst;
-    t_heaphdr *next;
-
-    if (!(lst = heap))
-    {
-        heap = new_heap;
-        heap->next = NULL;
-        return ;
-    }
-    while (lst->next && lst->next->heaptype < new_heap->heaptype)
-        lst = lst->next;
-    next = lst->next;
-    lst->next = new_heap;
-    new_heap->next = next;
-}
-
-t_heaphdr   *new_heaphdr(size_t size)
-{
-
-    t_heaphdr   new_heap;
-    void        *addr;
-    // size_t      heapsize;
-    // e_heaptype  heaptype;
-
     if (size < TINY_HEAP_BLOCK_SIZE)
-    {
-        new_heap.size = TINY_HEAP_ENTITY_SIZE;
-        new_heap.heaptype = HP_TINY;
-        new_heap.free_space = TINY_HEAP_ENTITY_SIZE - sizeof(t_blockhdr) - sizeof(t_heaphdr) - size;
-    }
+        return (HP_TINY);
     else if (size < SMALL_HEAP_BLOCK_SIZE)
-    {
-        new_heap.size = SMALL_HEAP_ENTITY_SIZE;
-        new_heap.heaptype = HP_SMALL;
-        new_heap.free_space = SMALL_HEAP_ENTITY_SIZE - sizeof(t_blockhdr) - sizeof(t_heaphdr) - size;
-    }
+        return (HP_SMALL);
+    return (HP_LARGE);
+}
+
+void        init_heap_first_block(t_heaphdr *heap)
+{
+    t_blockhdr *block;
+
+    block = (t_blockhdr *)(heap + 1);
+    block->prev = NULL;
+    block->next = NULL;
+    block->size = heap->free_space;
+    block->state = ST_FREE;
+}
+
+t_heaphdr   *new_heap(size_t size, e_heaptype heaptype, t_heaphdr *prev)
+{
+    t_heaphdr   *heap;
+    size_t      heap_size;
+    // size_t      i;
+
+    if (heaptype == HP_LARGE)
+        heap_size = size + sizeof(t_heaphdr) + sizeof(t_blockhdr);
+    else if (heaptype == HP_TINY)
+        heap_size = TINY_HEAP_ENTITY_SIZE;
     else
+        heap_size = SMALL_HEAP_ENTITY_SIZE;
+    if ((heap = mmap(NULL, heap_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0)) == MAP_FAILED)
     {
-        new_heap.size = size + sizeof(t_blockhdr) + sizeof(t_heaphdr);
-        new_heap.heaptype = HP_LARGE;
-        new_heap.free_space = 0;
-
-
-    }
-    write(2, "size:", 5);
-    ft_putnbr(new_heap.size);
-    write(2, " neededsize:", 11);
-    ft_putnbr(size);
-    write(2, "\ntype:", 6);
-    ft_putnbr(new_heap.heaptype);
-    write(2, "\n", 1);
-    // new_heap.next = NULL;
-    if ((addr = mmap(NULL, new_heap.size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS , -1, 0)) == MAP_FAILED)
-    {
-        write(2, "malloc error\n", 13);
-
+        write(2, "Map error\n", 10);
         return (NULL);
     }
-    *((t_heaphdr *)addr) = new_heap;
-    add_heap((t_heaphdr *)addr);
-    return ((t_heaphdr *)addr);
+    heap->next = NULL;
+    heap->prev = prev;
+    heap->heaptype = heaptype;
+    heap->size = heap_size;
+    heap->free_space = heap_size - sizeof(t_heaphdr) - sizeof(t_blockhdr);
+    heap->nb_block = 1;
+    init_heap_first_block(heap);
+    return (heap);
 }
 
-void        create_new_block(t_blockhdr *new_block, size_t size, e_state prev_state, e_state state)
-{
-    write(2, "in new blck\n", sizeof("in new blck\n"));
-    new_block->size = size;
-    new_block->prev_state = prev_state;
-    new_block->state = state;
-    write(2, "out new blck\n", sizeof("out new blck\n"));
+// int   check_next_block_on_heap(t_heaphdr *heap, t_blockhdr *block)
+// {
+//     if ((void *)block - (void *)heap + block->size + sizeof(t_blockhdr) <= heap->size)
+//         return (1);
+//     return (0);
+// }
 
+// t_blockhdr  *new_free_end_block(t_heaphdr *heap, t_blockhdr *block)
+// {
+//     t_blockhdr *free_block;
+
+//     free_block = (void *)block + sizeof(t_blockhdr) + block->size;
+//     free_block->next = NULL;
+//     free_block->prev = block;
+//     free_block->size = (void *)heap + heap->size - (void *)free_block - sizeof(t_blockhdr);
+//     free_block->state = ST_FREE;
+//     heap->nb_block++;
+
+//     return (free_block);
+// }
+
+// void  *new_block_insertion(t_heaphdr *heap, t_blockhdr *blockhdr, size_t size, size_t block_index, t_blockhdr *prev)
+// {
+//     if (block_index >= heap->nb_block)
+//     {
+//         blockhdr->next = NULL;
+//         blockhdr->prev = prev;
+//         blockhdr->size = size;
+//         blockhdr->state = ST_USE;
+//         heap->free_space -= (sizeof(t_blockhdr) + size);
+//         heap->nb_block++;
+//         if (check_next_block_on_heap(heap, blockhdr))
+//             blockhdr->next = new_free_end_block(heap, blockhdr);
+//         return (blockhdr);
+//     }
+//     // else
+//     // {
+//     //     blockhdr->next = NULL;
+//     //     blockhdr->prev = prev;
+//     //     blockhdr->size = size;
+//     //     blockhdr->state = ST_USE;
+//     //     heap->free_space -= (sizeof(t_blockhdr) + size);
+//     //     heap->nb_block++;
+//     //     if (check_next_block_on_heap(heap, blockhdr))
+//     //         blockhdr->next = new_free_end_block(heap, blockhdr);
+//     //     return (blockhdr);
+//     // }
+//     return (blockhdr);
+// }
+
+void        add_free_block(t_blockhdr *block, size_t size,
+    t_blockhdr *prev, t_blockhdr *next)
+{
+    block->prev = prev;
+    block->next = next;
+    block->size = size;
+    block->state = ST_FREE;
 }
 
-t_blockhdr  *create_free_space(size_t size)
+t_blockhdr  *update_block(t_heaphdr *heap, t_blockhdr *block, size_t size)
 {
-    t_heaphdr   *new_heap;
-    // t_blockhdr  *new_block;
-    // size_t      heapsize;
+    t_blockhdr  *next;
+    size_t      old_size;
 
-    write(2, "create free space\n", sizeof("create free space\n"));
-
-    if (!(new_heap = new_heaphdr(size)))
-        return (NULL);
-    // heapsize = new_heaphd->heapsize;
-    // new_block = (t_blockhdr *)(new_heap + 1);
-    // new_block->size = size;
-    // new_block->prev_state = ST_FREE;
-    // new_block->state = ST_USE;
-    create_new_block((t_blockhdr *)(new_heap + 1),
-            size, ST_FREE, ST_USE);
-    write(2, "new used blockhdr\n", sizeof("new used blockhdr\n"));
-
-    if (new_heap->heaptype != HP_LARGE)
+    if (block->size <= size + sizeof(t_blockhdr) + 16)
     {
-        create_new_block((t_blockhdr *)((void *)(new_heap + 1) + sizeof(t_blockhdr) + size),
-            new_heap->size - size - sizeof(t_blockhdr) - sizeof(t_heaphdr),
-            ST_USE,
-            ST_FREE);
-        write(2, "new free blockhdr\n", sizeof("new free blockhdr\n"));
-
-        // new_block = (void *)new_block + sizeof(t_blockhdr) + size;
-        // new_block->size = heapsize - size - sizeof(t_blockhdr) - sizeof(t_heaphdr);
-        // new_block->prev_state = ST_USE;
-        // new_block->state = ST_FREE;
+        block->state = ST_USE;
+        return (block);
     }
-    else
-        write(2, "no blockhdr after large\n", sizeof("no blockhdr after large\n"));
-    return ((t_blockhdr *)(new_heap + 1));
-}
-
-t_blockhdr  *check_heap_space(size_t size, t_heaphdr *curr)
-{
-    t_blockhdr  *block;
-    e_state     prev_state;
-
-    write(2, "check_heap_space in\n", sizeof("check_heap_space in\n"));
-
-    if (curr->heaptype == HP_LARGE)
-        return (NULL);
-    if (curr->heaptype == HP_TINY && size > TINY_HEAP_BLOCK_SIZE)
-        return (NULL);
-    if (curr->heaptype == HP_SMALL && (size > SMALL_HEAP_BLOCK_SIZE || size < TINY_HEAP_BLOCK_SIZE))
-        return (NULL);
-    block = (t_blockhdr *)(curr + 1);
-
-    // write(2, "check_heap_space in\n", sizeof("check_heap_space in\n"));
-    write(2, "block space:", 12);
-    ft_putnbr(curr->size);
-    write(2, "\n", 1);
-    prev_state = ST_FREE;
-    while (block)
-    {
-        // write(2, "loop check heap\n", sizeof("loop check heap\n"));
-        if (block->state == ST_FREE && size <= block->size)
-        {
-            write(2, "check_heap_space out finded\n", sizeof("check_heap_space out finded\n"));
-            create_new_block(block, size, prev_state, ST_USE);
-            // size_t size_left;
-            curr->free_space -= (size + sizeof(t_blockhdr));
-            // size_left = ((void *)curr + curr->size) - ((void *)block + sizeof(t_blockhdr) + size);
-            if (curr->free_space > sizeof(t_blockhdr))
-                create_new_block((void *)block + size + sizeof(t_blockhdr),
-                    curr->free_space, ST_USE, ST_FREE);
-            return (block);
-        }    // write(2, "la\n", 3);
-        if ((void *)block + block->size + sizeof(t_blockhdr) - (void *)curr > (long)curr->size)
-        {
-    write(2, "check_heap_space out\n", sizeof("check_heap_space out\n"));
-            return (NULL);
-
-//            write(2, "nn\n", 3);
-        }
-        prev_state = block->prev_state;
-        block = (void *)block + block->size + sizeof(t_blockhdr);
-    }
-    write(2, "check_heap_space out\n", sizeof("check_heap_space out\n"));
-            //write(2, "nn\n", 3);
-        
+    next = block->next;
+    old_size = block->size;
+    heap->free_space -= (size + sizeof(t_blockhdr));
+    heap->nb_block++;
+    block->size = size;
+    block->state = ST_USE;
+    block->next = (void *)block + sizeof(t_blockhdr) + size;
+    add_free_block(block->next, old_size - size - sizeof(t_blockhdr), block, next);
     return (block);
 }
 
-t_blockhdr    *find_free_space(size_t size)
+t_blockhdr  *check_for_insertion(t_heaphdr *heap, size_t size)
 {
-    t_blockhdr   *block;
-    t_heaphdr    *curr;
+    t_blockhdr  *block;
+    size_t      i;
 
-    write(2, "find free space\n", sizeof("find free space\n"));
-
-    if (!(curr = heap))
+    // while
+    // if (heap->nb_block == 0)
+    //     return (new_block_insertion(heap, (t_blockhdr *)(heap + 1), size, 0, NULL));
+    
+    block = (t_blockhdr *)(heap + 1);
+    i = 0;
+    while (i < heap->nb_block)
     {
-        // write(1, "chelou\n", 7);
-        return (create_free_space(size));
+        if (block->state == ST_FREE && block->size >= size)
+            return (update_block(heap, block, size));
+        block = block->next;
+        i++;
     }
-    while (curr)
-    {
-       write(2, "compare free space: " , sizeof("compare free space: "));
-        ft_putnbr(curr->free_space);
-       write(2, "\n", 1);
-        if (curr->free_space >= size && (block = check_heap_space(size, curr)))
-            return (block);
-        curr = curr->next;
-    }
-    // write(2, "end of find free space\n", sizeof("find free space \n"));
-    return (create_free_space(size));
+    // block = (t_blockhdr *)(heap + 1);
+    return (NULL);
 }
 
 void *malloc(size_t size)
 {
+    t_heaphdr   *heaps;
+    e_heaptype  htype;
     t_blockhdr  *block;
-    // t_heaphdr   *new_heap;
 
-    size = (size + 15) & (~15);
-    write(1, "malloc in\n", 10);
-    if (!(block = find_free_space(size)))
-    {
-        write(2, "malloc error\n", 13);
-        return ((void *)-1);
-    }
-    //write(2, "return\n", 7);
     show_alloc_mem();
-    write_addr((unsigned long)(block + 1));
-    write(1, "\n", 1);
-    return ((void *)(block + 1));
-    (void )size;
+    size = (size + 15) & (~15);
+    htype = get_heap_type(size);
+    if (!heap_list[htype] &&!(heap_list[htype] = new_heap(size, htype, NULL)))
+            return (NULL);
+    heaps = heap_list[htype];
+    while (heaps)
+    {
+        if (heaps->free_space >= size)
+        {
+            if ((block = check_for_insertion(heaps, size)))
+                return (block + 1);
+        }
+        if (!heaps->next && !(heaps->next = new_heap(size, htype, heaps)))
+            return (NULL);
+        heaps = heaps->next;
+    }
+    return (NULL);
 }

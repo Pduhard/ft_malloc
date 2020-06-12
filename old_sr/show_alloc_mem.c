@@ -1,25 +1,25 @@
 #include "libft_malloc.h"
 #include <stdio.h>
-void    write_addr(unsigned long addr)
-{
-    // unsigned long   addr;
-    unsigned char   hex[16];
-    unsigned long   i;
+// void    write_addr(unsigned long addr)
+// {
+//     // unsigned long   addr;
+//     unsigned char   hex[16];
+//     unsigned long   i;
 
-    i = 0;
-    // addr = (unsigned long)curr;
-    while (i < sizeof(unsigned long))
-    {
-        hex[i * 2] = (unsigned char)((addr >> ((sizeof(unsigned long) - i - 1) * 8)) & 0xff) / 16;
-        hex[i * 2 + 1] = (unsigned char)((addr >> ((sizeof(unsigned long) - i - 1) * 8)) & 0xff) % 16;
-        hex[i * 2] += hex[i * 2] > 9 ? ('a' - 10) : '0';
-        hex[i * 2 + 1] += hex[i * 2 + 1] > 9 ? ('a' - 10) : '0';
-        i++;
-    }
-    write(1, "0x", 2);
-    write(1, hex, 16);
-    // write(1, (char *)&addr, sizeof(unsigned long))
-}
+//     i = 0;
+//     // addr = (unsigned long)curr;
+//     while (i < sizeof(unsigned long))
+//     {
+//         hex[i * 2] = (unsigned char)((addr >> ((sizeof(unsigned long) - i - 1) * 8)) & 0xff) / 16;
+//         hex[i * 2 + 1] = (unsigned char)((addr >> ((sizeof(unsigned long) - i - 1) * 8)) & 0xff) % 16;
+//         hex[i * 2] += hex[i * 2] > 9 ? ('a' - 10) : '0';
+//         hex[i * 2 + 1] += hex[i * 2 + 1] > 9 ? ('a' - 10) : '0';
+//         i++;
+//     }
+//     write(1, "0x", 2);
+//     write(1, hex, 16);
+//     // write(1, (char *)&addr, sizeof(unsigned long))
+// }
 
 // void    write_heap_header(t_heaphdr *curr)
 // {
@@ -87,55 +87,20 @@ void    write_addr(unsigned long addr)
 //     // write(1, "\n", 1);
 // }
 
-void    write_blocks(t_blockhdr *block)
-{
-    while (block)
-    {
-        write_addr((unsigned long)block);
-        write(1, " - ", 3);
-        write_addr((unsigned long)block + block->size);
-        write(1, "\n", 1);
-        block = block->next;
-    }
-}
-void    show_alloc(t_heaphdr *heap, char *header, size_t header_size)
-{
-
-    while (heap)
-    {
-        write(1, header, header_size);
-        write_addr((unsigned long)heap);
-        write_blocks((t_blockhdr *)(heap + 1));
-        heap = heap->next;
-//     else if (curr->heaptype == HP_SMALL)
-//         write(1, MSG_SMALL_HDR, MSG_SMALL_HDR_SIZE);
-//     else if (curr->heaptype == HP_LARGE)
-//         write(1, MSG_LARGE_HDR, MSG_LARGE_HDR_SIZE);
-//     write_addr((unsigned long)curr);
-    }
-    
-
-}
-
 void    show_alloc_mem(void)
 {
-    show_alloc(heap_list[0], MSG_TINY_HDR, MSG_TINY_HDR_SIZE);
-    show_alloc(heap_list[1], MSG_SMALL_HDR, MSG_SMALL_HDR_SIZE);
-    show_alloc(heap_list[2], MSG_LARGE_HDR, MSG_LARGE_HDR_SIZE);
-    write(1, "end: \n", 6);
-    // ft_putnbr(head_list[0])
-//     t_heaphdr   *curr;
+    t_heaphdr   *curr;
 
-// // curr = (void *)-1;
-//     // write_addr(0xff12f33);
-//     // return ;
-//     curr = heap;
-//     while (curr)
-//     {
-//         // write_heap_header(curr);
-//         // write_heap_blocks(curr);
-//         // curr = curr->next;
-//     }
-//     write(1, "end of show\n", 12);
+// curr = (void *)-1;
+    // write_addr(0xff12f33);
+    // return ;
+    curr = heap[0];
+    while (curr)
+    {
+        // write_heap_header(curr);
+        // write_heap_blocks(curr);
+        curr = curr->next;
+    }
+    write(1, "end of show\n", 12);
     // exit(0);
 }

@@ -4,6 +4,16 @@
 # include <unistd.h>
 # include <stdlib.h>
 # include <sys/mman.h>
+
+# define HEAP_LIST_NB           4
+# define HEAP_LIST_HEADER       0
+# define HEAP_LIST_TINY         1
+# define HEAP_LIST_SMALL        2
+# define HEAP_LIST_LARGE        3
+
+# define HEAP_LIST_HEADER_START_SIZE    256
+# define HEAP_LIST_HEADER_MAX_SIZE      4096 * 2
+
 # define TINY_HEAP_BLOCK_SIZE   128
 # define TINY_HEAP_ENTITY_SIZE  16384
 # define SMALL_HEAP_BLOCK_SIZE  4096
@@ -23,22 +33,33 @@ typedef struct s_heaphdr
 {
     struct s_heaphdr    *next;
     struct s_heaphdr    *prev;
-    e_heaptype          heaptype;
     size_t              size;
-    size_t              free_space; // -sizeof(blockhdr)
-    size_t              nb_block;
+    size_t              free_space;
     // int                 a;
 }               t_heaphdr;
 
 typedef struct s_blockhdr
 {
-    struct s_blockhdr    *next;
-    struct s_blockhdr    *prev;
+    struct s_blockhdr   *prev;
+    void                *addr;
     size_t              size;
     e_state             state;
+// }
+
+//     state   
+//     void    *next;
+//     void    *prev;
+//     struct s_blockhdr   *next;
+//     struct s_blockhdr   *prev;
+// }
+//     size_t              size;
+//     e_state             prev_state;
+//     e_state             state;
 }               t_blockhdr;
 
-extern t_heaphdr *heap_list[3];
+extern t_heaphdr *heap_lists[4];
+
+
 
 void *malloc(size_t size);
 void free(void *ptr);
