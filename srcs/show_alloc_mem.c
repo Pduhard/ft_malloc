@@ -91,10 +91,12 @@ void    write_blocks(t_blockhdr *block)
 {
     while (block)
     {
-        write_addr((unsigned long)block);
+        write_addr((unsigned long)block + sizeof(t_blockhdr));
         write(1, " - ", 3);
-        write_addr((unsigned long)block + block->size);
-        write(1, "\n", 1);
+        write_addr((unsigned long)block + block->size + sizeof(t_blockhdr));
+        write(1, " : ", 1);
+        ft_putnbr(block->size);
+        write(1, " octets\n", 8);
         block = block->next;
     }
 }
@@ -105,6 +107,7 @@ void    show_alloc(t_heaphdr *heap, char *header, size_t header_size)
     {
         write(1, header, header_size);
         write_addr((unsigned long)heap);
+        write(1, "\n", 1);
         write_blocks((t_blockhdr *)(heap + 1));
         heap = heap->next;
 //     else if (curr->heaptype == HP_SMALL)
@@ -122,7 +125,7 @@ void    show_alloc_mem(void)
     show_alloc(heap_list[0], MSG_TINY_HDR, MSG_TINY_HDR_SIZE);
     show_alloc(heap_list[1], MSG_SMALL_HDR, MSG_SMALL_HDR_SIZE);
     show_alloc(heap_list[2], MSG_LARGE_HDR, MSG_LARGE_HDR_SIZE);
-    write(1, "end: \n", 6);
+    write(1, "end of show alloc mem \n", 6);
     // ft_putnbr(head_list[0])
 //     t_heaphdr   *curr;
 

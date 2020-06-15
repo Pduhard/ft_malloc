@@ -11,6 +11,9 @@
 // void show_mem();
 int main(void)
 {
+	char salut[12] = "salut\n12345\n";
+
+	printf("%p\n", salut);
 	// struct rlimit rlimit;
 	// void *data;
 
@@ -35,7 +38,7 @@ int main(void)
 	
 	// return (0);
 	rd = 0x5ff12340;
-	for (int i = 0; i < 200000; ++i)
+	for (int i = 0; i < 2000; ++i)
 	{
 		//printf("")
 		// ft_putnbr(rd >> 16);
@@ -44,14 +47,15 @@ int main(void)
 		char *e = malloc((rd >> 16)% 4096);
 		for (unsigned int j = 0; j < (rd >> 16) % 4096; j++)
 			*(e + j ) = 'f';
-		// realloc(e, 4097);
 		// free
 		rd ^= rd >> 2;
 		rd ^= rd << 4;
 		rd ^= rd >> 6;
-	printf("%d\n", i);
+	// printf("%d\n", i);
 		// show_alloc_mem();
 	}
+	// realloc(0x00005629f0483900, 4097);
+
 	// char *test = malloc(5);
 	// test = realloc(test +2, 7);
 	// e[0] = 'a';

@@ -76,7 +76,7 @@ all: $(NAME)
 # libft: $(LIBS)
 
 $(NAME): $(BINS)
-	@$(CC) $(FLAGS) -shared -o $(@) $(BINS) -I $(INCS)
+	@$(CC) $(FLAGS) -shared -o $@ $(BINS) -I $(INCS)
 	@echo "\n\n$(B)[Dylib \"$(NAME)\" READY]"
 # make_libft:
 

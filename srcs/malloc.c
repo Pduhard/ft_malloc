@@ -157,7 +157,8 @@ void *malloc(size_t size)
     e_heaptype  htype;
     t_blockhdr  *block;
 
-    show_alloc_mem();
+    // show_alloc_mem();
+    // write(1, "malloc in\n", 10);
     size = (size + 15) & (~15);
     htype = get_heap_type(size);
     if (!heap_list[htype] &&!(heap_list[htype] = new_heap(size, htype, NULL)))

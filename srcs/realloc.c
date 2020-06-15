@@ -1,21 +1,38 @@
 #include "libft_malloc.h"
 
-void    *copy_block(t_blockhdr *new_block, t_blockhdr *old_block, size_t size)
+void    *copy_block(t_blockhdr *new_block, t_blockhdr *old_block, size_t size, int unk_addr)
 {
     size_t  i;
     unsigned char   *src;
     unsigned char   *dst;
+    size_t  old_size;
+
 
     i = 0;
+    old_size = unk_addr ? size : old_block->size;
+    // exit(0);
+    // write(1, "nroaml\n", 7);
     dst = (unsigned char *)(new_block + 1);
     src = (unsigned char *)(old_block + 1);
-    while (i < size && i < old_block->size)
+    // write(1, "size: ", 6);
+    // ft_putnbr(size);
+
+    // write(1, "olb_blocksize: ", 15);
+    // ft_putnbr(old_block->size);
+    // write(1, ":: i = ", 7);
+    while (i < size && i < old_size)
     {
+        // write(1, "copy\n", 5);
         *dst = *src;
         dst++;
         src++;
         i++;
     }
+    // ft_putnbr(i);
+    // write(1, "\n", 1);
+    // write(1, "new_alloc: ", 11);
+    // write_addr((long)new_block + sizeof(t_blockhdr));
+    // write(1, "\n", 1);
     return new_block;
 }
 
@@ -29,12 +46,18 @@ void    *find_alloc(t_heaphdr *heap, size_t size, void *ptr)
         if ((void *)(block + 1) == ptr)
         {
             // check for space etc..
-            return (copy_block(malloc(size) - sizeof(block), block, size));
+            // write(1, "ok\n", 3);
+            // exit(0);
+            // write()
+            return (copy_block(malloc(size) - sizeof(t_blockhdr), block, size, 0));
         }
         block = block->next;
     }
-    write(1, "ajh\n", 4);
-
+    // write_addr((unsigned long)ptr);
+    // write(1, "\nwrong ptr in find alloc\n", 25);
+    // ft_putnbr(size);
+    // show_alloc_mem();
+// 0x00007fdc7ab7ffb8
     return (NULL);
 }
 
@@ -42,6 +65,7 @@ void *realloc(void *ptr, size_t size)
 {
     t_heaphdr   *heaps;
 
+    size = (size + 15) & (~15);
     if (!ptr)
         return (malloc(size));
     if (ptr && !size)
@@ -49,20 +73,36 @@ void *realloc(void *ptr, size_t size)
         free(ptr);
         return (NULL);
     }
+    // return (NULL);
     // htype = get_heap_type(size);
+    // write(1, "realloc ptr: ", 12);
+    // write_addr((unsigned long)ptr);
+
+    // write(1, "\nheap loop start\n", 17);
     int i = 0;
     while (i < 3)
     {
         heaps = heap_list[i];
         while (heaps)
         {
+            // write(1, "rea check heap\n", 15);
             if (ptr > (void *)heaps && ptr < (void *)heaps + heaps->size)
-                return (find_alloc(heaps, size, ptr));
+                return (find_alloc(heaps, size, ptr) + sizeof(t_blockhdr));
             heaps = heaps->next;
         }
+        // write(1, "rea next heap\n", 14);
+
         i++;
     }
+    // return ((void *)-1);
+    return (copy_block(malloc(size) - sizeof(t_blockhdr), ptr - sizeof(t_blockhdr), size, 1) + sizeof(t_blockhdr));
+    write(1, (char *)ptr, 156);
     write(1, "ajh\n", 4);
+    write_addr((unsigned long)ptr);
+    write(1, "\nwrong ptr\n", 11);
+    ft_putnbr(size);
+    show_alloc_mem();
+    exit(0);
     // t_heaphdr   *curr;
     // t_blockhdr  *block;
 
