@@ -43,6 +43,8 @@ BIN_PATH	=	./bins/
 SRC		=		malloc.c		\
 				free.c			\
 				realloc.c		\
+				reallocarray.c	\
+				calloc.c		\
 				show_alloc_mem.c		\
 				ft_putnbr.c		\
 

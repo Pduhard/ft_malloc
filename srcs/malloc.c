@@ -34,9 +34,10 @@ t_heaphdr   *new_heap(size_t size, e_heaptype heaptype, t_heaphdr *prev)
         heap_size = TINY_HEAP_ENTITY_SIZE;
     else
         heap_size = SMALL_HEAP_ENTITY_SIZE;
-    if ((heap = mmap(NULL, heap_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0)) == MAP_FAILED)
+    if ((heap = mmap(NULL, heap_size, PROT_READ | PROT_WRITE,
+        MAP_PRIVATE | MAP_ANON, -1, 0)) == MAP_FAILED)
     {
-        write(2, "Map error\n", 10);
+        write(2, "Mmap error\n", 11);
         return (NULL);
     }
     heap->next = NULL;
@@ -104,6 +105,8 @@ void        add_free_block(t_blockhdr *block, size_t size,
 {
     block->prev = prev;
     block->next = next;
+    if (next)
+        next->prev = block;
     block->size = size;
     block->state = ST_FREE;
 }
@@ -115,9 +118,15 @@ t_blockhdr  *update_block(t_heaphdr *heap, t_blockhdr *block, size_t size)
 
     if (block->size <= size + sizeof(t_blockhdr) + 16)
     {
+    // write(1, "insertion fill\n", 15);
+        block->size = size;
         block->state = ST_USE;
+        heap->free_space -= (block->size);
         return (block);
     }
+    // if (block == blockcheck)
+        // exit(0);
+        write(1, "in bcheck\n", 10);
     next = block->next;
     old_size = block->size;
     heap->free_space -= (size + sizeof(t_blockhdr));
@@ -125,7 +134,11 @@ t_blockhdr  *update_block(t_heaphdr *heap, t_blockhdr *block, size_t size)
     block->size = size;
     block->state = ST_USE;
     block->next = (void *)block + sizeof(t_blockhdr) + size;
+    // if ((int)(old_size - size - sizeof(t_blockhdr)) < 0)
+    //     exit(0);
     add_free_block(block->next, old_size - size - sizeof(t_blockhdr), block, next);
+    // exit(0);
+    // write(1, "insertion nblock\n", 17);
     return (block);
 }
 
@@ -169,7 +182,11 @@ void *malloc(size_t size)
         if (heaps->free_space >= size)
         {
             if ((block = check_for_insertion(heaps, size)))
+            {
+
+                // write(1, "malloc out\n", 11);
                 return (block + 1);
+            }
         }
         if (!heaps->next && !(heaps->next = new_heap(size, htype, heaps)))
             return (NULL);
