@@ -88,6 +88,7 @@ t_blockhdr  *create_free_space(size_t size)
     t_heaphdr   *new_heap;
     // t_blockhdr  *new_block;
     // size_t      heapsize;
+        return (NULL);
 
     write(2, "create free space\n", sizeof("create free space\n"));
 

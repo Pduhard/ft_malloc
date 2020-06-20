@@ -13,11 +13,13 @@
 
 ##__________CONFIG__________#
 
-NAME		=	libft_malloc.so
 
 ifeq ($(HOSTTYPE),)
 	HOSTTYPE := $(shell uname -m)_$(shell uname -s)
 endif
+
+NAME		=	libft_malloc_$(HOSTTYPE).so
+
 
 CC			=	clang
 # NASM		= 	nasm
@@ -46,7 +48,13 @@ SRC		=		malloc.c		\
 				reallocarray.c	\
 				calloc.c		\
 				show_alloc_mem.c		\
+				show_alloc_mem_hex.c		\
+				heap.c			\
+				block.c			\
+				find.c			\
 				ft_putnbr.c		\
+				ft_putstr.c		\
+				ft_strlen.c		\
 
 # ASM_SRC	= unpack.s	\
 
@@ -78,7 +86,8 @@ all: $(NAME)
 # libft: $(LIBS)
 
 $(NAME): $(BINS)
-	@$(CC) $(FLAGS) -shared -o $@ $(BINS) -I $(INCS)
+	@$(CC) $(FLAGS) -shared -lpthread  -Wl,-soname,libft_malloc.so -o $@ $(BINS) -I $(INC_DIR)
+	@test -f libft_malloc.so || ln -s libft_malloc_$(HOSTTYPE).so libft_malloc.so
 	@echo "\n\n$(B)[Dylib \"$(NAME)\" READY]"
 # make_libft:
 
@@ -110,5 +119,7 @@ fclean: clean
 
 	@echo "\n${R}[REMOVING \"$(NAME)\"]"
 	@rm -f $(NAME)
+	@echo "\n${R}[REMOVING \"libft_malloc.so\"]"
+	@rm -f libft_malloc.so
 
 re: fclean all
