@@ -6,15 +6,14 @@
 # include <sys/mman.h>
 # include <pthread.h>
 # include <strings.h>
-
+// #include <pthread.h>
 # define NB_BLOCKS  100
-# define TINY_HEAP_BLOCK_SIZE   1024
+# define TINY_HEAP_BLOCK_SIZE   128
 # define INFO   0
 # define HEX    1
-
 //# define TINY_HEAP_ENTITY_SIZE  16384
 
-# define SMALL_HEAP_BLOCK_SIZE  8092
+# define SMALL_HEAP_BLOCK_SIZE  1024
 
 //# define SMALL_HEAP_ENTITY_SIZE 524288
 
@@ -53,8 +52,6 @@ typedef struct  s_alloc
 
 extern t_alloc   g_alloc;
 
-extern t_heaphdr *heap_list[2]; // SMALL/TINY and LARGE
-// extern void *blockcheck;
 extern pthread_mutex_t	g_mutex;
 
 void *malloc(size_t size);

@@ -1,65 +1,57 @@
 #include "libft_malloc.h"
 
-void ft_memcpy(void *dst, void *src, size_t size)
+void	ft_memcpy(void *dst, void *src, size_t size)
 {
-    unsigned char *s;
-    unsigned char *d;
+	unsigned char	*s;
+	unsigned char	*d;
 
-    d = (unsigned char *)dst;
-    s = (unsigned char *)src;
-    while (size--)
-        *d++ = *s++;
+	d = (unsigned char *)dst;
+	s = (unsigned char *)src;
+	while (size--)
+		*d++ = *s++;
 }
 
-void *realloc(void *ptr, size_t size)
+int	find_realloc(void *ptr, size_t size,
+		t_heaphdr **heap_addr, t_blockhdr **block_addr)
 {
-    void        *new_alloc;
-    // size_t      old_size;
-    size_t      true_size;
-    t_heaphdr   *heap;
-    t_blockhdr  *block;
-    
-    // ft_putstr("non\n");
+	*heap_addr = NULL;
+	*block_addr = NULL;
+	if (!size)
+		free(ptr);
+	else if (!ptr)
+		*block_addr = (void *)-1;
+	else if (!find_alloc(ptr, heap_addr, block_addr))
+		return (0);
+	else
+		return (1);
+	return (0);
+}
 
-    // exit(0);
-    // pthread_mutex_lock(&g_mutex);
+void	*realloc(void *ptr, size_t size)
+{
+	void		*new_alloc;
+	size_t		true_size;
+	t_heaphdr	*heap;
+	t_blockhdr	*block;
 
-    if (!size)
-    {
-        free(ptr);
-        
-        // pthread_mutex_unlock(&g_mutex);
-        return (NULL);
-    }
-    if (!ptr)
-    {
-        // pthread_mutex_unlock(&g_mutex);
-        return (malloc(size));
-    }
-    // ft_putstr("realloc\n");
-    if (!find_alloc(ptr, &heap, &block))
-    {
-        // pthread_mutex_unlock(&g_mutex);
-        return (NULL);
-    }
-    true_size = get_true_block_size(block, heap);
-    if (true_size >= size)
-    {
-        block->user_size = size;
-        // pthread_mutex_unlock(&g_mutex);
-        return (block + 1);
-        // init_block(new_block, (t_blockhdr){block, block->next, free_space, ST_FREE});
-    }
-    new_alloc = malloc(size);
-    // old_size = ((t_blockhdr *)(ptr - sizeof(t_blockhdr)))->user_size;
-    ft_memcpy(new_alloc, ptr, block->user_size > size ? size : block->user_size);
-    free_block(heap, block);
-    // ft_putstr("non\n");
-
-    // pthread_mutex_unlock(&g_mutex);
-    return (new_alloc);
-    // exit(0);
-    return (NULL);
-    (void)size;
-    (void)ptr;
+	new_alloc = NULL;
+	pthread_mutex_lock(&g_mutex);
+	if (!find_realloc(ptr, size, &heap, &block))
+	{
+		pthread_mutex_unlock(&g_mutex);
+		return (block ? malloc(size) : NULL);
+	}
+	true_size = get_true_block_size(block, heap);
+	if (true_size >= size)
+	{
+		block->user_size = size;
+		pthread_mutex_unlock(&g_mutex);
+		return (block + 1);
+	}
+	pthread_mutex_unlock(&g_mutex);
+	new_alloc = malloc(size);
+	ft_memcpy(new_alloc, ptr, block->user_size > size
+		? size : block->user_size);
+	free_block(heap, block);
+	return (new_alloc);
 }
