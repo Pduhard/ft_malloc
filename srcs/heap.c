@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   heap.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pduhard- <pduhard-@student.42lyon.fr>      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/06/23 01:05:52 by pduhard-          #+#    #+#             */
+/*   Updated: 2020/06/23 01:19:42 by pduhard-         ###   ########lyon.fr   */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "libft_malloc.h"
 
-size_t		get_heap_size(size_t size, e_heaptype heaptype)
+size_t		get_heap_size(size_t size, t_heaptype heaptype)
 {
 	size_t	heap_size;
 	size_t	page_size;
@@ -17,7 +29,7 @@ size_t		get_heap_size(size_t size, e_heaptype heaptype)
 }
 
 void		init_heap_hdr(t_heaphdr *heap, size_t heap_size,
-		e_heaptype heaptype, t_heaphdr *prev)
+		t_heaptype heaptype, t_heaphdr *prev)
 {
 	heap->prev = prev;
 	heap->next = NULL;
@@ -25,7 +37,7 @@ void		init_heap_hdr(t_heaphdr *heap, size_t heap_size,
 	heap->size = heap_size;
 }
 
-t_heaphdr	*new_heap(size_t size, e_heaptype heaptype, t_heaphdr *prev)
+t_heaphdr	*new_heap(size_t size, t_heaptype heaptype, t_heaphdr *prev)
 {
 	t_heaphdr	*heap;
 	size_t		heap_size;

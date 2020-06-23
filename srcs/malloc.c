@@ -1,9 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   malloc.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pduhard- <pduhard-@student.42lyon.fr>      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/06/23 01:05:56 by pduhard-          #+#    #+#             */
+/*   Updated: 2020/06/23 01:19:44 by pduhard-         ###   ########lyon.fr   */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "libft_malloc.h"
 
 t_alloc		g_alloc = (t_alloc){NULL, NULL, NULL};
 pthread_mutex_t	g_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-t_heaphdr	**get_heap_list(size_t size, e_heaptype *heaptype)
+t_heaphdr	**get_heap_list(size_t size, t_heaptype *heaptype)
 {
 	if (size <= TINY_HEAP_BLOCK_SIZE)
 	{
@@ -59,7 +71,7 @@ t_blockhdr	*find_space_in_heap(t_heaphdr *heap, size_t size)
 	return (NULL);
 }
 
-t_blockhdr	*find_heap(t_heaphdr *heap_lst, size_t size, e_heaptype heaptype)
+t_blockhdr	*find_heap(t_heaphdr *heap_lst, size_t size, t_heaptype heaptype)
 {
 	t_blockhdr	*block;
 	int			check_inf;
@@ -83,7 +95,7 @@ void		*malloc(size_t size)
 {
 	t_heaphdr	**heap_lst_addr;
 	t_blockhdr	*block;
-	e_heaptype	heaptype;
+	t_heaptype	heaptype;
 
 	pthread_mutex_lock(&g_mutex);
 	if (!(heap_lst_addr = get_heap_list(size, &heaptype)))

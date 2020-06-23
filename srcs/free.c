@@ -1,8 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   free.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pduhard- <pduhard-@student.42lyon.fr>      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/06/23 01:05:35 by pduhard-          #+#    #+#             */
+/*   Updated: 2020/06/23 01:19:35 by pduhard-         ###   ########lyon.fr   */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "libft_malloc.h"
 
 void	reassign_heap_ptr(t_heaphdr *heap)
 {
-	e_heaptype htype;
+	t_heaptype htype;
 
 	htype = heap->heaptype;
 	if (htype == HP_TINY)

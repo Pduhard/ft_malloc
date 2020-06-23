@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   realloc.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pduhard- <pduhard-@student.42lyon.fr>      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/06/23 01:06:00 by pduhard-          #+#    #+#             */
+/*   Updated: 2020/06/23 01:20:36 by pduhard-         ###   ########lyon.fr   */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "libft_malloc.h"
 
 void	ft_memcpy(void *dst, void *src, size_t size)
@@ -11,8 +23,8 @@ void	ft_memcpy(void *dst, void *src, size_t size)
 		*d++ = *s++;
 }
 
-int	find_realloc(void *ptr, size_t size,
-		t_heaphdr **heap_addr, t_blockhdr **block_addr)
+int		find_realloc(void *ptr, size_t size,
+			t_heaphdr **heap_addr, t_blockhdr **block_addr)
 {
 	*heap_addr = NULL;
 	*block_addr = NULL;

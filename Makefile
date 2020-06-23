@@ -20,55 +20,36 @@ endif
 
 NAME		=	libft_malloc_$(HOSTTYPE).so
 
-
 CC			=	clang
-# NASM		= 	nasm
+
 FLAGS		=	-Wall -Werror -Wextra -O3 -ffast-math -march=native -flto -fPIC
-# SFLAGS		=	-f elf64 -O3
-# LIB_FLAGS	=	-L$(LIB_PATH) $(LIB_FLAG)
-INC_DIR		=	./includes/
-INCLUDES	=	libft_malloc.h
-# OTOOL_INC_DIR	=	otool/includes/
-# OTOOL_INCLUDES	=	ft_otool.h
-# COMMON_INC_DIR	=	common/includes/
-# COMMON_INCLUDES	=	common.h
 
+INC_PATH	=	./includes/
 SRC_PATH	=	./srcs/
-# OTOOL_SRC_PATH	=	./otool/srcs/
-# COMMON_SRC_PATH	=	./common/srcs/
-
 BIN_PATH	=	./bins/
-# OTOOL_BIN_PATH	=	./otool/bins/
-# COMMON_BIN_PATH	=	./common/bins/
-# LIB_PATH	=	./libft/
 
-SRC		=		malloc.c		\
-				free.c			\
-				realloc.c		\
-				reallocarray.c	\
-				calloc.c		\
+INCLUDES	=	libft_malloc.h
+
+SRC		=		malloc.c				\
+				free.c					\
+				realloc.c				\
+				reallocarray.c			\
+				calloc.c				\
 				show_alloc_mem.c		\
-				show_alloc_mem_hex.c		\
-				heap.c			\
-				block.c			\
-				find.c			\
-				ft_putnbr.c		\
-				ft_putstr.c		\
-				ft_strlen.c		\
-
-# ASM_SRC	= unpack.s	\
+				show_alloc_mem_hex.c	\
+				show_utils.c			\
+				heap.c					\
+				block.c					\
+				find.c					\
+				ft_putnbr.c				\
+				ft_putstr.c				\
+				ft_strlen.c				\
+				ft_bzero.c				\
 
 BIN			=	$(SRC:.c=.o)
-# ASM_BIN = $(ASM_SRC:.s=.o)
-
-# LIB_FLAG			=	-lft
-# LIB						=	libft.a
 
 BINS				=	$(addprefix $(BIN_PATH), $(BIN))
-# SRCS				=	$(addprefix $(SRC_PATH), $(SRC))
-# ASM_BINS			= $(addprefix $(BIN_PATH), $(ASM_BIN))
-# LIBS				=	$(addprefix $(LIB_PATH), $(LIB))
-INCS				=	$(addprefix $(INC_DIR), $(INCLUDES))
+INCS				=	$(addprefix $(INC_PATH), $(INCLUDES))
 
 .PHONY: all clean fclean re
 
@@ -83,32 +64,15 @@ N			=	\33[0m
 
 all: $(NAME)
 
-# libft: $(LIBS)
-
 $(NAME): $(BINS)
-	@$(CC) $(FLAGS) -shared -lpthread  -Wl,-soname,libft_malloc.so -o $@ $(BINS) -I $(INC_DIR)
+	@$(CC) $(FLAGS) -shared -lpthread  -Wl,-soname,libft_malloc.so -o $@ $(BINS) -I $(INC_PATH)
 	@test -f libft_malloc.so || ln -s libft_malloc_$(HOSTTYPE).so libft_malloc.so
 	@echo "\n\n$(B)[Dylib \"$(NAME)\" READY]"
-# make_libft:
-
-# 		@make -C $(LIB_PATH)
-
-# $(LIBS):
-
-# 	@make -C $(LIB_PATH)
 
 $(BIN_PATH)%.o: $(SRC_PATH)%.c $(INCS)
 
 	@mkdir -p $(BIN_PATH) || true
-	@$(CC) $(FLAGS) -I $(INC_DIR) -o $@ -c $< && echo "${G} ${N}\c"
-
-# $(BIN_PATH)%.o: $(SRC_PATH)%.s $(INCS)
-
-# 	@mkdir -p $(BIN_PATH) || true
-# 	@$(NASM) $(SFLAGS) -I $(INC_DIR) -o $@ $< && echo "${G} \c"
-
-test:
-	@LD_PRELOAD=./$(NAME) /bin/ls
+	@$(CC) $(FLAGS) -I $(INC_PATH) -o $@ -c $< && echo "${G} ${N}\c"
 
 clean:
 
